@@ -1,4 +1,4 @@
-import { Bot } from "grammy";
+import {Bot} from "grammy";
 import dotenv from "dotenv";
 import fs from "fs";
 import cron from "node-cron";
@@ -53,7 +53,7 @@ function getDaysUntilNewYear(): { daysPassed: number; totalDays: number } {
     console.log(`DEBUG: Total days in ${currentYear}: ${totalDays}`);
     console.log(`DEBUG: Is leap year: ${isLeapYear}`);
 
-    return { daysPassed: dayOfYear, totalDays };
+    return {daysPassed: dayOfYear, totalDays};
 }
 
 // Helper: generate the 4-line countdown string with perfect alignment
@@ -95,22 +95,16 @@ function generateCountdown(daysPassed: number, totalDays: number) {
 // Function to send/update countdown
 async function updateCountdown() {
     try {
-        const { daysPassed, totalDays } = getDaysUntilNewYear();
+        const {daysPassed, totalDays} = getDaysUntilNewYear();
         const countdownMessage = generateCountdown(daysPassed, totalDays);
 
-        // If we already sent a message before, edit it
-        if (data.messageId) {
-            await bot.api.editMessageText(channelId, data.messageId, countdownMessage, {
-                parse_mode: "Markdown"
-            });
-            console.log(`✅ Countdown updated! Day ${daysPassed}/${totalDays}`);
-        } else {
-            const sent = await bot.api.sendMessage(channelId, countdownMessage, {
-                parse_mode: "Markdown"
-            });
-            data.messageId = sent.message_id;
-            console.log(`✅ Countdown message created! Day ${daysPassed}/${totalDays}`);
-        }
+
+        const sent = await bot.api.sendMessage(channelId, countdownMessage, {
+            parse_mode: "Markdown"
+        });
+        data.messageId = sent.message_id;
+        console.log(`✅ Countdown message created! Day ${daysPassed}/${totalDays}`);
+
 
         fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
     } catch (error) {
@@ -142,7 +136,7 @@ bot.command("reset", async (ctx) => {
 
 // Command to check current status
 bot.command("status", async (ctx) => {
-    const { daysPassed, totalDays } = getDaysUntilNewYear();
+    const {daysPassed, totalDays} = getDaysUntilNewYear();
     const daysRemaining = totalDays - daysPassed;
     const percentage = ((daysPassed / totalDays) * 100).toFixed(1);
 
@@ -157,15 +151,15 @@ bot.command("status", async (ctx) => {
 
 // Command to test countdown display
 bot.command("test", async (ctx) => {
-    const { daysPassed, totalDays } = getDaysUntilNewYear();
+    const {daysPassed, totalDays} = getDaysUntilNewYear();
     const countdownMessage = generateCountdown(daysPassed, totalDays);
-    await ctx.reply(countdownMessage, { parse_mode: "Markdown" });
+    await ctx.reply(countdownMessage, {parse_mode: "Markdown"});
 });
 
 // Command to simulate daily progress (for testing)
 bot.command("sendcountdown", async (ctx) => {
     try {
-        const { daysPassed, totalDays } = getDaysUntilNewYear();
+        const {daysPassed, totalDays} = getDaysUntilNewYear();
 
         // FORCE recalculation - always use current day as base if testCount seems wrong
         if (data.testCount === undefined || data.testCount < daysPassed) {
@@ -224,7 +218,7 @@ bot.command("sendcountdown", async (ctx) => {
 
         await ctx.reply(
             `✅ Countdown updated in channel!\n` +
-            `📊 Day ${data.testCount}/${totalDays} (${((data.testCount/totalDays)*100).toFixed(1)}%)\n` +
+            `📊 Day ${data.testCount}/${totalDays} (${((data.testCount / totalDays) * 100).toFixed(1)}%)\n` +
             `Message ID: ${newMessageId}`
         );
     } catch (error: any) {
@@ -235,7 +229,7 @@ bot.command("sendcountdown", async (ctx) => {
 
 // Command to reset test countdown
 bot.command("resettestcount", async (ctx) => {
-    const { daysPassed } = getDaysUntilNewYear();
+    const {daysPassed} = getDaysUntilNewYear();
     data.testCount = daysPassed; // Reset to current actual day
     data.testMessageId = undefined;
     fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
