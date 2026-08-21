@@ -8,6 +8,14 @@ dotenv.config();
 const token = process.env.BOT_TOKEN!;
 const channelId = Number(process.env.CHANNEL_ID);
 
+// Telegram user IDs allowed to run commands. Empty means nobody.
+const adminIds = new Set(
+    (process.env.ADMIN_IDS ?? "")
+        .split(",")
+        .map((id) => Number(id.trim()))
+        .filter((id) => Number.isInteger(id) && id !== 0)
+);
+
 const bot = new Bot(token);
 
 // Countdown config
@@ -118,6 +126,26 @@ async function updateCountdown() {
 cron.schedule("0 7 * * *", () => {
     console.log("⏰ Running scheduled countdown update at 7:00 AM");
     updateCountdown();
+});
+
+// Gate every command behind ADMIN_IDS. Without this, anyone who finds the bot
+// could post to the channel. Fails closed: no admins configured means no commands.
+bot.use(async (ctx, next) => {
+    if (!ctx.message?.text?.startsWith("/")) return next();
+
+    if (adminIds.size === 0) {
+        console.warn("⚠️ Command rejected: ADMIN_IDS is not configured.");
+        await ctx.reply("⚠️ This bot has no admins configured. Set ADMIN_IDS to enable commands.");
+        return;
+    }
+
+    if (!ctx.from || !adminIds.has(ctx.from.id)) {
+        console.warn(`⛔ Unauthorized command from user ${ctx.from?.id ?? "unknown"}`);
+        await ctx.reply("⛔ You are not authorized to use this bot.");
+        return;
+    }
+
+    await next();
 });
 
 // Manual command to trigger update immediately

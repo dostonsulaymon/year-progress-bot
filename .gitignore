@@ -1,2 +1,13 @@
 /node_modules
 /.idea
+
+# Environment variables — never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Build output
+/dist
+
+# Runtime state (regenerated on first run)
+countdown.json

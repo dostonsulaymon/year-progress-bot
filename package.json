@@ -1,14 +1,14 @@
 {
   "name": "year-counter-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Telegram bot that posts a daily year-progress bar to a channel",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Doston Sulaymon",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "dotenv": "^17.2.3",
